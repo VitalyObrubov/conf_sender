@@ -1,11 +1,16 @@
-import os
+import os, logging
 import sys
 from app.globals import app, Config, setup_app
 from app.email import send_email
 from time import sleep
+from app.logger import errors_catching
 
+logging.basicConfig(level=logging.INFO, filename="logs/py_log.log",filemode="a",
+                    format="%(asctime)s %(levelname)s %(message)s") 
 
+@errors_catching
 def send_config(user):
+    print("send mail to "+user["email"])
     app.g_drive.download_conf_file(user["conf"], app)
     to_addr = [user["email"]]
     cc_addr = [app.config.email.email_host_user] 
@@ -15,7 +20,7 @@ def send_config(user):
 
     app.g_drive.clear_temp()
 
-
+@errors_catching
 def check_orders():
     print("check orders")
     app.database.autorize(app)
@@ -33,7 +38,7 @@ def check_orders():
         else:
             break
 
-
+@errors_catching
 def main():
     conf_file = "config.ini"
     setup_app(os.path.join(os.path.dirname(__file__), conf_file))
